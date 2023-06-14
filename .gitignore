@@ -5,6 +5,8 @@
 .DS_Store
 **/*_cache/
 **/*_cache/**
+**/*_files/
+**/*_files/**
 /.quarto/
 !docs/**
 docs/.DS_Store
