@@ -163,6 +163,14 @@ Comparisons with variation in sample size and targeting. May also produce a reas
 -   transparency in decision making
 -   complete reproducibility if data is shared
 
+## Report everything!?
+
+- You can share a fully documented report file as an appendix document with the preprint
+- Example:
+
+>Rozental, A., Forsström, D., & Johansson, M. (2023). A Psychometric Evaluation of the Swedish Translation of the Perceived Stress Scale: A Rasch Analysis [Preprint]. In Review. <https://doi.org/10.21203/rs.3.rs-2699284/v1>
+
+
 ## A note on templates
 
 Our group at RISE have made an analysis template based on our preprint, in which we propose a reporting standard for psychometric analyses. It builds on Tennant & Conaghan's 2007 paper and others.
