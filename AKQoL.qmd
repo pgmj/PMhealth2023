@@ -1,0 +1,286 @@
+---
+title: "AKQoL Rasch analysis"
+subtitle: "Actinic Keratosis Quality of Life"
+title-block-banner: "#009ca6"
+title-block-banner-color: "#FFFFFF"
+author: 
+  name: 'Magnus Johansson'
+  affiliation: 'RISE Research Institutes of Sweden'
+  affiliation-url: 'https://www.ri.se/kbm'
+  orcid: '0000-0003-1669-592X'
+date: last-modified
+date-format: YYYY-MM-DD
+format:
+  html:
+    theme: materia
+    toc: true
+    mainfont: 'Lato'
+    monofont: 'Roboto Mono'
+    code-overflow: wrap
+    code-tools: true
+    code-fold: true
+    code-link: true
+    number-sections: true
+    fig-dpi: 96
+    layout-align: left
+    linestretch: 1.6
+    license: CC BY
+execute: 
+  cache: true
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+---
+
+## Itemlabels
+
+This is actually created primarily using copy&paste from the Word-file available in "Supporting Information" in the paper. I changed the variable names and the first variable to be character format rather than numeric.
+
+```{r}
+#install.packages("datapasta")
+# use the "paste as dataframe" in the "Addins" meny above, after installing the library "datapasta"
+itemlabels <- data.frame(
+  stringsAsFactors = FALSE,
+                itemnr = paste0("q",c(1:9)),
+                item = c("During the last week I have been annoyed with having to protect my skin each time I’m going out in the sun.",
+                       "During the last week my sun damaged skin has given me a reason to think about what is important in life.",
+                       "During the last week my quality of life has been decreased because of my sun damaged skin.",
+                       "During the last week I have feared that the sun damage of my skin will develop into a more serious skin disease.",
+                       "During the last week I have tried to hide my sun damaged skin from other people with e.g. make-up or clothes.",
+                       "During the last week I have felt guilt in relation to my sun damaged skin.",
+                       "During the last week I have looked at my skin and examined it for sun damages.",
+                       "During the last week my life has been more difficult because of the sun damages of my skin.",
+                       "During the last week I have thought about how to behave in the sun.")
+)
+```
+
+## Import data
+
+```{r}
+### If needed, install the devtools package:
+# install.packages('devtools')
+### Then install the RISEkbmRasch package and its dependencies:
+# devtools::install_github("pgmj/RISEkbmRasch", dependencies = TRUE)
+library(RISEkbmRasch)
+library(skimr)
+library(TAM)
+library(psych)
+
+sc <- read.csv("scqol.csv")
+
+scItems <- sc %>% 
+  select(starts_with("SCQ")) %>% 
+  select(!ends_with("Q10"))
+
+dif.sex <- factor(sc$Sex)
+dif.age <- sc$Age
+
+names(scItems) <- paste0("q",c(1:9))
+```
+
+## SCQoL
+
+### Descriptives
+
+::: {.panel-tabset}
+#### Demographics
+```{r}
+RIdemographics(dif.sex,"Sex")
+```
+
+```{r}
+hist(dif.age, main = "Age", col = "lightblue", xlab = "Age in years")
+
+describe(dif.age) %>% 
+  select(n,mean,median,min,max,range,skew,kurtosis) %>% 
+  mutate_if(is.numeric, round, 2) %>% 
+  kbl_rise()
+```
+#### Ordinal sum scores
+```{r}
+RIrawdist(scItems)
+```
+
+#### Missing/item
+```{r}
+RImissing(scItems)
+```
+#### Missing/person
+```{r}
+RImissingP(scItems)
+```
+#### Tile plot
+```{r}
+RItileplot(scItems)
+```
+#### Stacked bars
+```{r}
+RIbarstack(scItems)
+```
+#### Guttman heatmap
+```{r}
+RIheatmap(scItems)
+```
+#### Barplots
+```{r}
+#| layout-ncol: 2
+RIbarplot(scItems)
+```
+#### Expected Value Curves
+```{r}
+#| layout-ncol: 2
+tam1 <- tam(as.matrix(scItems), irtmodel = "PCM", verbose = FALSE)
+plot(tam1)
+```
+#### Skim
+```{r}
+skim(scItems)
+```
+#### All responses
+```{r}
+RIallresp(scItems)
+```
+:::
+
+### Rasch analysis 1
+
+::: {.panel-tabset}
+#### Item fit
+```{r}
+RIitemfitPCM(scItems)
+```
+#### PCA of residuals
+```{r}
+RIpcmPCA(scItems)
+```
+#### Loadings on 1st contrast
+```{r}
+RIloadLoc(na.omit(scItems))
+```
+#### Residual correlations
+```{r}
+RIresidcorr(scItems, 0.2)
+```
+#### Response categories
+```{r}
+#| layout-ncol: 2
+RIitemCats(scItems)
+```
+#### Targeting
+```{r}
+RItargeting(scItems)
+```
+#### Item hierarchy
+```{r}
+#| fig-height: 8
+RIitemHierarchy(scItems)
+```
+:::
+
+### DIF
+
+#### Gender
+
+```{r}
+RIdifTable(scItems, dif.sex)
+```
+
+#### Age
+```{r}
+RIdifTable(scItems, dif.age)
+```
+
+
+## AKQoL
+
+```{r}
+ak <- read.csv("akqol.csv")
+
+ak.sex <- factor(ak$Sex)
+
+akItems <- ak %>% 
+  select(starts_with("AKQ"))
+
+names(akItems) <- paste0("q",c(1:9))
+
+```
+
+### Descriptives
+
+::: {.panel-tabset}
+#### Tile plot
+```{r}
+RItileplot(akItems)
+```
+#### Stacked bars
+```{r}
+RIbarstack(akItems)
+```
+#### Guttman heatmap
+```{r}
+RIheatmap(akItems)
+```
+#### Barplots
+```{r}
+#| layout-ncol: 2
+RIbarplot(akItems)
+```
+#### Expected Value Curves
+```{r}
+#| layout-ncol: 2
+tam1 <- tam(as.matrix(akItems), irtmodel = "PCM", verbose = FALSE)
+plot(tam1)
+```
+#### Skim
+```{r}
+skim(akItems)
+```
+#### All responses
+```{r}
+RIallresp(akItems)
+```
+:::
+
+### Rasch analysis 1
+
+::: {.panel-tabset}
+#### Item fit
+```{r}
+RIitemfitPCM(akItems)
+```
+#### PCA of residuals
+```{r}
+RIpcmPCA(akItems)
+```
+#### Loadings on 1st contrast
+```{r}
+RIloadLoc(na.omit(akItems))
+```
+#### Residual correlations
+```{r}
+RIresidcorr(akItems, 0.2)
+```
+#### Response categories
+```{r}
+#| layout-ncol: 2
+RIitemCats(akItems)
+```
+#### Targeting
+```{r}
+RItargeting(akItems)
+```
+#### Item hierarchy
+```{r}
+#| fig-height: 8
+RIitemHierarchy(akItems)
+```
+:::
+
+### DIF
+
+#### Gender
+
+```{r}
+RIdifTable(akItems, ak.sex)
+```
