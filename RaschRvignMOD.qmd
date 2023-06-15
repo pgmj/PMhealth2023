@@ -8,7 +8,7 @@ author:
   affiliation: 'RISE Research Institutes of Sweden'
   affiliation-url: 'https://www.ri.se/kbm'
   orcid: '0000-0003-1669-592X'
-date: 2023-05-26
+date: last-modified
 date-format: YYYY-MM-DD
 format:
   html:
@@ -31,7 +31,7 @@ execute:
   warning: false
   message: false
 bibliography: references.bib
-
+css: styles.css
 editor_options: 
   chunk_output_type: console
 ---
